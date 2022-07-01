@@ -28,6 +28,8 @@ function App() {
                 console.log("down");
                 break;
             case "ArrowLeft":
+                setBoard(board => mergeLeft(board));
+                setUpdate(update => !update);
                 console.log("left");
                 break;
             case "ArrowRight":
@@ -170,4 +172,45 @@ const mergeRight = board => {
     return board;
 };
 
+const mergeLeft = board => {
+    for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+        for (let colIdx = COLS - 1; colIdx >= 0; colIdx--) {
+            let currentTileNumber = board[rowIdx][colIdx].number;
+
+            if (!currentTileNumber) {
+                continue;
+            }
+
+            for (let col = colIdx - 1; col >= 0; col--) {
+                if (!board[rowIdx][col].number) {
+                    continue;
+                }
+
+                if (currentTileNumber === board[rowIdx][col].number) {
+                    board[rowIdx][colIdx].number = null;
+                    board[rowIdx][col].number *= 2;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+        for (let colIdx = COLS - 1; colIdx >= 0; colIdx--) {
+            if (board[colIdx][rowIdx].number) {
+                continue;
+            }
+
+            for (let col = 0; col < COLS; col++) {
+                if (board[rowIdx][col].number) {
+                    board[rowIdx][colIdx].number = board[rowIdx][col].number;
+                    board[rowIdx][col].number = null;
+                    break;
+                }
+            }
+        }
+    }
+    return board;
+};
 export default App;
