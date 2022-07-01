@@ -5,6 +5,28 @@ import { useEffect, useState } from "react";
 const ROWS = 4;
 const COLS = 4;
 
+/**
+ * @param {KeyboardEvent} e
+ */
+function keyDownHandler(e) {
+    switch (e.key) {
+        case "ArrowUp":
+            console.log("up");
+            break;
+        case "ArrowDown":
+            console.log("down");
+            break;
+        case "ArrowLeft":
+            console.log("left");
+            break;
+        case "ArrowRight":
+            console.log("right");
+            break;
+        default:
+            return;
+    }
+}
+
 function App() {
     let [board, setBoard] = useState([]);
 
@@ -16,24 +38,26 @@ function App() {
     }, []);
 
     return (
-        <div className="board-wrapper">
-            <div className="board">
-                {board.map((row, rowIdx) => {
-                    return (
-                        <div className="row" key={rowIdx}>
-                            {row.map(({ row, col, number }, tileIdx) => {
-                                return (
-                                    <Tile
-                                        key={tileIdx}
-                                        number={number}
-                                        row={row}
-                                        col={col}
-                                    />
-                                );
-                            })}
-                        </div>
-                    );
-                })}
+        <div className="game" tabIndex={0} onKeyDown={keyDownHandler}>
+            <div className="board-wrapper">
+                <div className="board">
+                    {board.map((row, rowIdx) => {
+                        return (
+                            <div className="row" key={rowIdx}>
+                                {row.map(({ row, col, number }, tileIdx) => {
+                                    return (
+                                        <Tile
+                                            key={tileIdx}
+                                            number={number}
+                                            row={row}
+                                            col={col}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );
@@ -55,6 +79,11 @@ const createInitialBoard = () => {
     return board;
 };
 
+/**
+ * @param {number} row
+ * @param {number} col
+ * @returns {{ col: number, row: number, number: number }}
+ */
 const createTile = (row, col) => {
     return {
         col,
@@ -63,6 +92,9 @@ const createTile = (row, col) => {
     };
 };
 
+/**
+ * @param {{ col: number, row: number, number: number }[][]} board
+ */
 const getRandomTile = board => {
     const emptyTiles = [];
 
