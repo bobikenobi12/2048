@@ -8,7 +8,7 @@ const COLS = 4;
 /**
  * @param {KeyboardEvent} e
  */
-function keyDownHandler(e) {
+const keyDownHandler = e => {
     switch (e.key) {
         case "ArrowUp":
             console.log("up");
@@ -25,9 +25,9 @@ function keyDownHandler(e) {
         default:
             return;
     }
-}
+};
 
-function App() {
+export default function App() {
     let [board, setBoard] = useState([]);
 
     useEffect(() => {
@@ -116,5 +116,3 @@ const getRandomTile = board => {
 
     return board;
 };
-
-export default App;

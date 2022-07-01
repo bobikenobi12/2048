@@ -4,7 +4,7 @@ import "./Tile.css";
  * @param {string} str
  * @returns {string}
  */
-function hashCode(str) {
+const hashCode = str => {
     let hash = 0;
 
     for (let i = 0; i < str.length; i++) {
@@ -12,22 +12,22 @@ function hashCode(str) {
     }
 
     return hash;
-}
+};
 
 /**
  * @param {string} hash
  * @returns {string}
  */
-function hashToHex(hash) {
+const hashToHex = hash => {
     let color = ((~hash >>> 0) & 0x00ffffff).toString(16).toUpperCase();
 
     return "00000".substring(0, 6 - color.length) + color;
-}
+};
 
 /**
  * @param {{ number?: number }} props
  */
-function Tile(props) {
+export default function Tile(props) {
     let seed = "";
 
     if (props?.number) {
@@ -47,5 +47,3 @@ function Tile(props) {
         </div>
     );
 }
-
-export default Tile;
