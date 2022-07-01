@@ -28,7 +28,9 @@ function Tile(props) {
     return (
         <div
             className="tile"
-            style={{ backgroundColor: `#${hashToHex(hashCode(seed))}` }}
+            style={{
+                backgroundColor: `#${hashToHex(hashCode(seed))}`,
+            }}
         >
             {props?.number || " "}
         </div>
