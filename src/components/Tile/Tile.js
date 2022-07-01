@@ -11,7 +11,7 @@ function hashCode(str) {
 }
 
 function hashToHex(hash) {
-    let color = (hash & 0x00ffffff).toString(16).toUpperCase();
+    let color = ((~hash >>> 0) & 0x00ffffff).toString(16).toUpperCase();
 
     return "00000".substring(0, 6 - color.length) + color;
 }
