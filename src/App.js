@@ -7,8 +7,10 @@ const COLS = 4;
 
 /**
  * @param {KeyboardEvent} e
+ * @param {{ col: number, row: number, number: number }[][]} board
+ * @param {(board: { col: number, row: number, number: number }[][]) => void} setBoard
  */
-function keyDownHandler(e) {
+function keyDownHandler(e, board, setBoard) {
     switch (e.key) {
         case "ArrowUp":
             console.log("up");
@@ -21,6 +23,8 @@ function keyDownHandler(e) {
             break;
         case "ArrowRight":
             console.log("right");
+            setBoard(merge(board));
+            console.log(board);
             break;
         default:
             return;
@@ -38,7 +42,11 @@ function App() {
     }, []);
 
     return (
-        <div className="game" tabIndex={0} onKeyDown={keyDownHandler}>
+        <div
+            className="game"
+            tabIndex={0}
+            onKeyDown={e => keyDownHandler(e, board, setBoard)}
+        >
             <div className="board-wrapper">
                 <div className="board">
                     {board.map((row, rowIdx) => {
@@ -123,28 +131,31 @@ const getRandomTile = board => {
  * @param {number} rowIdx
  * @returns {{ col: number, row: number, number: number }[][]}
  */
+const merge = board => {
+    for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+        for (let colIdx = 0; colIdx < COLS; colIdx++) {
+            let currentTileNumber = board[rowIdx][colIdx].number;
 
-const merge = (board, rowIdx, direction) => {
-    colLoop: for (let colIdx = 0; colIdx < board.length; colIdx++) {
-        if (!board[rowIdx][colIdx].number) {
-            continue colLoop;
-        }
-        traverseRemainingTiles: for (
-            let col = colIdx + 1;
-            colIdx < board.length;
-            col++
-        ) {
-            if (!board[rowIdx][colIdx].number) {
-                continue traverseRemainingTiles;
+            if (!currentTileNumber) {
+                continue;
             }
-            if (board[rowIdx][colIdx].number === board[rowIdx][col]) {
-                board[rowIdx][colIdx].number = null;
-                board[rowIdx][col].number *= 2;
-            } else {
-                break traverseRemainingTiles;
+
+            for (let col = colIdx + 1; col < COLS; col++) {
+                if (!board[rowIdx][col].number) {
+                    continue;
+                }
+
+                if (currentTileNumber === board[rowIdx][col].number) {
+                    board[rowIdx][colIdx].number = null;
+                    board[rowIdx][col].number *= 2;
+                } else {
+                    break;
+                }
             }
         }
     }
+
     return board;
 };
+
 export default App;
