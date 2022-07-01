@@ -8,7 +8,7 @@ const COLS = 4;
 /**
  * @param {KeyboardEvent} e
  */
-const keyDownHandler = e => {
+function keyDownHandler(e) {
     switch (e.key) {
         case "ArrowUp":
             console.log("up");
@@ -25,9 +25,9 @@ const keyDownHandler = e => {
         default:
             return;
     }
-};
+}
 
-export default function App() {
+function App() {
     let [board, setBoard] = useState([]);
 
     useEffect(() => {
@@ -116,3 +116,35 @@ const getRandomTile = board => {
 
     return board;
 };
+
+/**
+ *
+ * @param {{ col: number, row: number, number: number }[][]} board
+ * @param {number} rowIdx
+ * @returns {{ col: number, row: number, number: number }[][]}
+ */
+
+const merge = (board, rowIdx, direction) => {
+    colLoop: for (let colIdx = 0; colIdx < board.length; colIdx++) {
+        if (!board[rowIdx][colIdx].number) {
+            continue colLoop;
+        }
+        traverseRemainingTiles: for (
+            let col = colIdx + 1;
+            colIdx < board.length;
+            col++
+        ) {
+            if (!board[rowIdx][colIdx].number) {
+                continue traverseRemainingTiles;
+            }
+            if (board[rowIdx][colIdx].number === board[rowIdx][col]) {
+                board[rowIdx][colIdx].number = null;
+                board[rowIdx][col].number *= 2;
+            } else {
+                break traverseRemainingTiles;
+            }
+        }
+    }
+    return board;
+};
+export default App;
