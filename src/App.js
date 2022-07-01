@@ -5,34 +5,9 @@ import { useEffect, useState } from "react";
 const ROWS = 4;
 const COLS = 4;
 
-/**
- * @param {KeyboardEvent} e
- * @param {{ col: number, row: number, number: number }[][]} board
- * @param {(board: { col: number, row: number, number: number }[][]) => void} setBoard
- */
-function keyDownHandler(e, board, setBoard) {
-    switch (e.key) {
-        case "ArrowUp":
-            console.log("up");
-            break;
-        case "ArrowDown":
-            console.log("down");
-            break;
-        case "ArrowLeft":
-            console.log("left");
-            break;
-        case "ArrowRight":
-            console.log("right");
-            setBoard(merge(board));
-            console.log(board);
-            break;
-        default:
-            return;
-    }
-}
-
 function App() {
     let [board, setBoard] = useState([]);
+    let [_, setUpdate] = useState(false);
 
     useEffect(() => {
         const board = createInitialBoard();
@@ -41,12 +16,33 @@ function App() {
         setBoard(getRandomTile(board));
     }, []);
 
+    /**
+     * @param {KeyboardEvent} e
+     */
+    function keyDownHandler(e) {
+        switch (e.key) {
+            case "ArrowUp":
+                console.log("up");
+                break;
+            case "ArrowDown":
+                console.log("down");
+                break;
+            case "ArrowLeft":
+                console.log("left");
+                break;
+            case "ArrowRight":
+                console.log("right");
+                setBoard(board => mergeRight(board));
+                setUpdate(update => !update);
+                console.log(board);
+                break;
+            default:
+                return;
+        }
+    }
+
     return (
-        <div
-            className="game"
-            tabIndex={0}
-            onKeyDown={e => keyDownHandler(e, board, setBoard)}
-        >
+        <div className="game" tabIndex={0} onKeyDown={keyDownHandler}>
             <div className="board-wrapper">
                 <div className="board">
                     {board.map((row, rowIdx) => {
@@ -131,7 +127,7 @@ const getRandomTile = board => {
  * @param {number} rowIdx
  * @returns {{ col: number, row: number, number: number }[][]}
  */
-const merge = board => {
+const mergeRight = board => {
     for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
         for (let colIdx = 0; colIdx < COLS; colIdx++) {
             let currentTileNumber = board[rowIdx][colIdx].number;
@@ -149,6 +145,22 @@ const merge = board => {
                     board[rowIdx][colIdx].number = null;
                     board[rowIdx][col].number *= 2;
                 } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+        for (let colIdx = 0; colIdx < COLS; colIdx++) {
+            if (board[rowIdx][colIdx].number) {
+                continue;
+            }
+
+            for (let col = colIdx - 1; col >= 0; col--) {
+                if (board[rowIdx][col].number) {
+                    board[rowIdx][colIdx].number = board[rowIdx][col].number;
+                    board[rowIdx][col].number = null;
                     break;
                 }
             }
