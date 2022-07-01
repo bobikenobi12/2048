@@ -22,19 +22,16 @@ function App() {
     function keyDownHandler(e) {
         switch (e.key) {
             case "ArrowUp":
-                console.log("up");
                 break;
             case "ArrowDown":
-                console.log("down");
+                setBoard(board => mergeDown(board));
+                setUpdate(update => !update);
                 break;
             case "ArrowLeft":
-                console.log("left");
                 break;
             case "ArrowRight":
-                console.log("right");
                 setBoard(board => mergeRight(board));
                 setUpdate(update => !update);
-                console.log(board);
                 break;
             default:
                 return;
@@ -122,9 +119,7 @@ const getRandomTile = board => {
 };
 
 /**
- *
  * @param {{ col: number, row: number, number: number }[][]} board
- * @param {number} rowIdx
  * @returns {{ col: number, row: number, number: number }[][]}
  */
 const mergeRight = board => {
@@ -161,6 +156,54 @@ const mergeRight = board => {
                 if (board[rowIdx][col].number) {
                     board[rowIdx][colIdx].number = board[rowIdx][col].number;
                     board[rowIdx][col].number = null;
+                    break;
+                }
+            }
+        }
+    }
+
+    return board;
+};
+
+/**
+ *
+ * @param {{ col: number, row: number, number: number }[][]} board
+ * @returns {{ col: number, row: number, number: number }[][]}
+ */
+const mergeDown = board => {
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+            let currentTileNumber = board[rowIdx][colIdx].number;
+
+            if (!currentTileNumber) {
+                continue;
+            }
+
+            for (let row = rowIdx + 1; row < ROWS; row++) {
+                if (!board[row][colIdx].number) {
+                    continue;
+                }
+
+                if (currentTileNumber === board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = null;
+                    board[row][colIdx].number *= 2;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+            if (board[rowIdx][colIdx].number) {
+                continue;
+            }
+
+            for (let row = rowIdx - 1; row >= 0; row--) {
+                if (board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = board[row][colIdx].number;
+                    board[row][colIdx].number = null;
                     break;
                 }
             }
