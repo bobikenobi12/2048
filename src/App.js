@@ -22,20 +22,23 @@ function App() {
     function keyDownHandler(e) {
         switch (e.key) {
             case "ArrowUp":
+                setBoard(board => mergeUp(board));
                 break;
             case "ArrowDown":
                 setBoard(board => mergeDown(board));
-                setUpdate(update => !update);
                 break;
             case "ArrowLeft":
+                setBoard(board => mergeLeft(board));
                 break;
             case "ArrowRight":
                 setBoard(board => mergeRight(board));
-                setUpdate(update => !update);
                 break;
             default:
                 return;
         }
+
+        setBoard(getRandomTile(board));
+        setUpdate(update => !update);
     }
 
     return (
@@ -166,6 +169,53 @@ const mergeRight = board => {
 };
 
 /**
+ * @param {{ col: number, row: number, number: number }[][]} board
+ * @returns {{ col: number, row: number, number: number }[][]}
+ */
+const mergeLeft = board => {
+    for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+        for (let colIdx = COLS - 1; colIdx >= 0; colIdx--) {
+            let currentTileNumber = board[rowIdx][colIdx].number;
+
+            if (!currentTileNumber) {
+                continue;
+            }
+
+            for (let col = colIdx - 1; col >= 0; col--) {
+                if (!board[rowIdx][col].number) {
+                    continue;
+                }
+
+                if (currentTileNumber === board[rowIdx][col].number) {
+                    board[rowIdx][colIdx].number = null;
+                    board[rowIdx][col].number *= 2;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+        for (let colIdx = 0; colIdx < COLS; colIdx++) {
+            if (board[colIdx][rowIdx].number) {
+                continue;
+            }
+
+            for (let col = colIdx + 1; col < COLS; col++) {
+                if (board[rowIdx][col].number) {
+                    board[rowIdx][colIdx].number = board[rowIdx][col].number;
+                    board[rowIdx][col].number = null;
+                    break;
+                }
+            }
+        }
+    }
+
+    return board;
+};
+
+/**
  *
  * @param {{ col: number, row: number, number: number }[][]} board
  * @returns {{ col: number, row: number, number: number }[][]}
@@ -201,6 +251,53 @@ const mergeDown = board => {
             }
 
             for (let row = rowIdx - 1; row >= 0; row--) {
+                if (board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = board[row][colIdx].number;
+                    board[row][colIdx].number = null;
+                    break;
+                }
+            }
+        }
+    }
+
+    return board;
+};
+
+/**
+ * @param {{ col: number, row: number, number: number }[][]} board
+ * @returns {{ col: number, row: number, number: number }[][]}
+ */
+const mergeUp = board => {
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = ROWS - 1; rowIdx >= 0; rowIdx--) {
+            let currentTileNumber = board[rowIdx][colIdx].number;
+
+            if (!currentTileNumber) {
+                continue;
+            }
+
+            for (let row = rowIdx - 1; row >= 0; row--) {
+                if (!board[row][colIdx].number) {
+                    continue;
+                }
+
+                if (currentTileNumber === board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = null;
+                    board[row][colIdx].number *= 2;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+            if (board[rowIdx][colIdx].number) {
+                continue;
+            }
+
+            for (let row = rowIdx + 1; row < ROWS; row++) {
                 if (board[row][colIdx].number) {
                     board[rowIdx][colIdx].number = board[row][colIdx].number;
                     board[row][colIdx].number = null;
