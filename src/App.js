@@ -7,6 +7,7 @@ const COLS = 4;
 
 function App() {
     let [board, setBoard] = useState([]);
+    // eslint-disable-next-line no-unused-vars
     let [_, setUpdate] = useState(false);
 
     useEffect(() => {
@@ -22,26 +23,25 @@ function App() {
     function keyDownHandler(e) {
         switch (e.key) {
             case "ArrowUp":
+                setBoard(board => mergeUp(board));
                 break;
             case "ArrowDown":
                 setBoard(board => mergeDown(board));
-                setUpdate(update => !update);
                 break;
             case "ArrowLeft":
-<<<<<<< HEAD
                 setBoard(board => mergeLeft(board));
-                setUpdate(update => !update);
-                console.log("left");
-=======
->>>>>>> 6e120faa390fb173176888dea076193aaac7e4a1
                 break;
             case "ArrowRight":
                 setBoard(board => mergeRight(board));
-                setUpdate(update => !update);
                 break;
             default:
                 return;
         }
+
+        setTimeout(() => {
+            setBoard(getRandomTile(board));
+            setUpdate(update => !update);
+        }, 10);
     }
 
     return (
@@ -145,6 +145,7 @@ const mergeRight = board => {
                 if (currentTileNumber === board[rowIdx][col].number) {
                     board[rowIdx][colIdx].number = null;
                     board[rowIdx][col].number *= 2;
+                    colIdx = col;
                 } else {
                     break;
                 }
@@ -172,7 +173,7 @@ const mergeRight = board => {
 };
 
 /**
- *  @param {{ col: number, row: number, number: number }[][]} board
+ * @param {{ col: number, row: number, number: number }[][]} board
  * @returns {{ col: number, row: number, number: number }[][]}
  */
 const mergeLeft = board => {
@@ -192,6 +193,7 @@ const mergeLeft = board => {
                 if (currentTileNumber === board[rowIdx][col].number) {
                     board[rowIdx][colIdx].number = null;
                     board[rowIdx][col].number *= 2;
+                    colIdx = col;
                 } else {
                     break;
                 }
@@ -200,12 +202,12 @@ const mergeLeft = board => {
     }
 
     for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
-        for (let colIdx = COLS - 1; colIdx >= 0; colIdx--) {
-            if (board[colIdx][rowIdx].number) {
+        for (let colIdx = 0; colIdx < COLS; colIdx++) {
+            if (board[rowIdx][colIdx].number) {
                 continue;
             }
 
-            for (let col = 0; col < COLS; col++) {
+            for (let col = colIdx + 1; col < COLS; col++) {
                 if (board[rowIdx][col].number) {
                     board[rowIdx][colIdx].number = board[rowIdx][col].number;
                     board[rowIdx][col].number = null;
@@ -214,6 +216,56 @@ const mergeLeft = board => {
             }
         }
     }
+
+    return board;
+};
+
+/**
+ *
+ * @param {{ col: number, row: number, number: number }[][]} board
+ * @returns {{ col: number, row: number, number: number }[][]}
+ */
+const mergeDown = board => {
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+            let currentTileNumber = board[rowIdx][colIdx].number;
+
+            if (!currentTileNumber) {
+                continue;
+            }
+
+            for (let row = rowIdx + 1; row < ROWS; row++) {
+                if (!board[row][colIdx].number) {
+                    continue;
+                }
+
+                if (currentTileNumber === board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = null;
+                    board[row][colIdx].number *= 2;
+                    rowIdx = row;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+            if (board[rowIdx][colIdx].number) {
+                continue;
+            }
+
+            for (let row = rowIdx - 1; row >= 0; row--) {
+                if (board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = board[row][colIdx].number;
+                    board[row][colIdx].number = null;
+                    break;
+                }
+            }
+        }
+    }
+
     return board;
 };
 
@@ -221,47 +273,48 @@ const mergeLeft = board => {
  * @param {{ col: number, row: number, number: number }[][]} board
  * @returns {{ col: number, row: number, number: number }[][]}
  */
- const mergeDown = board => {
-  for (let colIdx = 0; colIdx < COLS; colIdx++) {
-      for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
-          let currentTileNumber = board[rowIdx][colIdx].number;
+const mergeUp = board => {
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = ROWS - 1; rowIdx >= 0; rowIdx--) {
+            let currentTileNumber = board[rowIdx][colIdx].number;
 
-          if (!currentTileNumber) {
-              continue;
-          }
+            if (!currentTileNumber) {
+                continue;
+            }
 
-          for (let row = rowIdx + 1; row < ROWS; row++) {
-              if (!board[row][colIdx].number) {
-                  continue;
-              }
+            for (let row = rowIdx - 1; row >= 0; row--) {
+                if (!board[row][colIdx].number) {
+                    continue;
+                }
 
-              if (currentTileNumber === board[row][colIdx].number) {
-                  board[rowIdx][colIdx].number = null;
-                  board[row][colIdx].number *= 2;
-              } else {
-                  break;
-              }
-          }
-      }
-  }
+                if (currentTileNumber === board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = null;
+                    board[row][colIdx].number *= 2;
+                    rowIdx = row;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
 
-  for (let colIdx = 0; colIdx < COLS; colIdx++) {
-      for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
-          if (board[rowIdx][colIdx].number) {
-              continue;
-          }
+    for (let colIdx = 0; colIdx < COLS; colIdx++) {
+        for (let rowIdx = 0; rowIdx < ROWS; rowIdx++) {
+            if (board[rowIdx][colIdx].number) {
+                continue;
+            }
 
-          for (let row = rowIdx - 1; row >= 0; row--) {
-              if (board[row][colIdx].number) {
-                  board[rowIdx][colIdx].number = board[row][colIdx].number;
-                  board[row][colIdx].number = null;
-                  break;
-              }
-          }
-      }
-  }
+            for (let row = rowIdx + 1; row < ROWS; row++) {
+                if (board[row][colIdx].number) {
+                    board[rowIdx][colIdx].number = board[row][colIdx].number;
+                    board[row][colIdx].number = null;
+                    break;
+                }
+            }
+        }
+    }
 
-  return board;
+    return board;
 };
 
 export default App;
